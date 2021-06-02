@@ -36,7 +36,6 @@ class FlutterGooglePay {
       return false;
     }
     try {
-
       Map request = {
         "apiVersion": 2,
         "apiVersionMinor": 0,
@@ -51,8 +50,13 @@ class FlutterGooglePay {
         ]
       };
 
-      Map map = await (_channel
-          .invokeMethod("is_available", {"environment": environment, "request": request}) as FutureOr<Map<dynamic, dynamic>>);
+      Map map = await (_channel.invokeMethod(
+        "is_available",
+        {
+          "environment": environment,
+          "request": request,
+        },
+      ));
       return map['isAvailable'];
     } catch (error) {
       return false;
@@ -126,7 +130,11 @@ class PaymentItem {
     args.addAll({"currencyCode": currencyCode});
     args.addAll({"gateway": gateway});
     args.addAll({"gatewayMerchantId": gatewayMerchantId});
-    args.addAll({"allowedCardNetworks": allowedCardNetworks.map((item) => item.toString().split('.')[1]).toList()});
+    args.addAll({
+      "allowedCardNetworks": allowedCardNetworks
+          .map((item) => item.toString().split('.')[1])
+          .toList()
+    });
     args.addAll({"stripeToken": stripeToken});
     args.addAll({"stripeVersion": stripeVersion});
     return args;
@@ -190,7 +198,8 @@ class PaymentBuilder {
     if (_shippingSupportedCountries != null) {
       List? allowedCountryCodes = _shippingSupportedCountries;
       shippingAddressParameters["allowedCountryCodes"] = allowedCountryCodes;
-      paymentDataRequest["shippingAddressParameters"] = shippingAddressParameters;
+      paymentDataRequest["shippingAddressParameters"] =
+          shippingAddressParameters;
     }
     return paymentDataRequest;
   }
@@ -237,7 +246,8 @@ class PaymentBuilder {
 
   addStripeKey(String publishableKey, String version) {
     if (_isStripe) {
-      Map<dynamic, dynamic> params = _gatewayTokenizationSpecification!['parameters'];
+      Map<dynamic, dynamic> params =
+          _gatewayTokenizationSpecification!['parameters'];
       params['stripe:publishableKey'] = publishableKey;
       params['stripe:version'] = version;
       _gatewayTokenizationSpecification!['parameters'] = params;
@@ -292,7 +302,9 @@ class PaymentBuilder {
   ///    "VISA"
   addAllowedCardNetworks(List<PaymentNetwork> allowedCardNetworks) {
     if (allowedCardNetworks != null && allowedCardNetworks.length > 0) {
-      _allowedCardNetworks = allowedCardNetworks.map((item) => item.toString().split('.')[1]).toList();
+      _allowedCardNetworks = allowedCardNetworks
+          .map((item) => item.toString().split('.')[1])
+          .toList();
     }
   }
 
@@ -305,7 +317,10 @@ class PaymentBuilder {
   /// an Android device authenticated with a 3-D Secure cryptogram (CRYPTOGRAM_3DS).
   addAllowedCardAuthMethods(List<AuthMethod> allowedCardAuthMethods) {
     if (allowedCardAuthMethods != null && allowedCardAuthMethods.length > 0) {
-      _allowedCardAuthMethods = allowedCardAuthMethods.map((item) => item.toString().split('.')[1]).toList();;
+      _allowedCardAuthMethods = allowedCardAuthMethods
+          .map((item) => item.toString().split('.')[1])
+          .toList();
+      ;
     }
   }
 
@@ -389,13 +404,6 @@ bool isEmpty(String? value) {
   return value == null || value.length == 0;
 }
 
-enum PaymentNetwork {
-  VISA,
-  MASTERCARD,
-  AMEX
-}
+enum PaymentNetwork { VISA, MASTERCARD, AMEX }
 
-enum AuthMethod {
-  PAN_ONLY,
-  CRYPTOGRAM_3DS
-}
+enum AuthMethod { PAN_ONLY, CRYPTOGRAM_3DS }
